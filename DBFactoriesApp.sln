@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBFactoriesApp", "DBFactoriesApp\DBFactoriesApp.csproj", "{120AC26F-5FD6-4088-BDB3-6071998689B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncWindowsApplication", "AsyncWindowsApplication\AsyncWindowsApplication.csproj", "{FBCBE492-A7E8-4951-8E4D-F1AC2ECFC2C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{120AC26F-5FD6-4088-BDB3-6071998689B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{120AC26F-5FD6-4088-BDB3-6071998689B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{120AC26F-5FD6-4088-BDB3-6071998689B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{120AC26F-5FD6-4088-BDB3-6071998689B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBCBE492-A7E8-4951-8E4D-F1AC2ECFC2C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBCBE492-A7E8-4951-8E4D-F1AC2ECFC2C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBCBE492-A7E8-4951-8E4D-F1AC2ECFC2C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBCBE492-A7E8-4951-8E4D-F1AC2ECFC2C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B69D985-4CBA-4B70-AD00-81B641D2E233}
+	EndGlobalSection
+EndGlobal
