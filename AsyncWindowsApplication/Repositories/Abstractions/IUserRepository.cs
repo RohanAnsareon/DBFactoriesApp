@@ -1,4 +1,5 @@
-﻿using AsyncWindowsApplication.Models;
+﻿using AsyncWindowsApplication.CustomEventArgs;
+using AsyncWindowsApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,9 +11,10 @@ namespace AsyncWindowsApplication.Repositories.Abstractions
 {
     public interface IUserRepository
     {
+        event EventHandler<NotifyInsertEventArgs> NotifyInsertEvent;
         event EventHandler<ErrorEventArgs> NotifyClientErrorEvent;
 
-        Task<int> Create(User user);
+        Task Create(User user);
         Task Update(User user);
         Task Delete(int id);
         Task<IEnumerable<User>> Get();

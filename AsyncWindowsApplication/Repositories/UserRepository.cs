@@ -1,4 +1,5 @@
-﻿using AsyncWindowsApplication.Models;
+﻿using AsyncWindowsApplication.CustomEventArgs;
+using AsyncWindowsApplication.Models;
 using AsyncWindowsApplication.Repositories.Abstractions;
 using Serilog;
 using System;
@@ -17,13 +18,14 @@ namespace AsyncWindowsApplication.Repositories
         private readonly string connectionString;
 
         public event EventHandler<ErrorEventArgs> NotifyClientErrorEvent;
+        public event EventHandler<NotifyInsertEventArgs> NotifyInsertEvent;
 
         public UserRepository(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
-        public async Task<int> Create(User user)
+        public async Task Create(User user)
         {
             var sql = @"INSERT INTO [dbo].[User]
                                ([Name]
@@ -58,7 +60,7 @@ namespace AsyncWindowsApplication.Repositories
                         if (await command.ExecuteNonQueryAsync() == 0) 
                             throw new Exception("No changes in db");
 
-                        return Convert.ToInt32(idParam.Value);
+                        this.NotifyInsertEvent.Invoke(this, new NotifyInsertEventArgs( Convert.ToInt32(idParam.Value)));
                     }
                 }
             }
@@ -73,7 +75,6 @@ namespace AsyncWindowsApplication.Repositories
                 this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(ex));
                 Log.Logger.Error(ex.ToString());
             }
-            return 0;
         }
 
         public async Task Delete(int id)

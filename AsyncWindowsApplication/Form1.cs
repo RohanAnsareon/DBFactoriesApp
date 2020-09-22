@@ -24,6 +24,9 @@ namespace AsyncWindowsApplication
             this.repository.NotifyClientErrorEvent += (sender, eventArgs) =>
                 MessageBox.Show(eventArgs.GetException().Message);
 
+            this.repository.NotifyInsertEvent += (sender, args) =>
+                MessageBox.Show($"User with {args.Id} id was created");
+
             Refresh();
         }
 
@@ -31,15 +34,13 @@ namespace AsyncWindowsApplication
 
         private async void addBtn_Click(object sender, EventArgs e)
         {
-            var id = await this.repository.Create(new User
+            await this.repository.Create(new User
             {
                 Name = this.nameTextBox.Text,
                 Age = Convert.ToInt32(this.ageTextBox.Text)
             });
 
-            if (id != 0) MessageBox.Show($"User with {id} id was created");
-
-            Refresh();
+            await Refresh();
         }
 
         private void deleteBtn_Click(object sender, EventArgs e)
