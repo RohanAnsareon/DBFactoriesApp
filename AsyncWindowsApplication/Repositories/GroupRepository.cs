@@ -1,6 +1,4 @@
 ﻿using AsyncWindowsApplication.Models;
-using AsyncWindowsApplication.Repositories.Abstractions;
-using AsyncWindowsApplication.Validation;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,107 +8,94 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace AsyncWindowsApplication.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class GroupRepository : IGroupRepository
     {
         private readonly string connectionString;
 
         public event EventHandler<ErrorEventArgs> NotifyClientErrorEvent;
 
-        public UserRepository(string connectionString)
+        public GroupRepository(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
-        public async Task<int> Create(User user)
+        public async  Task<int> Create(Group group)
         {
-            
-                var UserSql = @"INSERT INTO [dbo].[User]
-                               ([Name],
-                               [Age],
-                               [GroupId])
+            var sql = @"INSERT INTO [dbo].[Group]
+                               ([Title])
                          VALUES
-                               (@Name
-                               ,@Age
-                               ,@GroupId);
+                               (@Title);
                         SET @id=SCOPE_IDENTITY()";
-            
-                try
-                {
-                if (!GroupValid.ValidateInsert(user, this.connectionString))
-                {
-                    throw new Exception("No Group whith this id");
-                }
+
+            try
+            {
                 using (var connection = new SqlConnection(this.connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (var command = connection.CreateCommand())
                     {
-                        await connection.OpenAsync();
+                        command.CommandText = sql;
+
+                        command.Parameters.AddWithValue("@Title",group.Title);
 
 
-                        using (var command = connection.CreateCommand())
+                        var idParam = new SqlParameter
                         {
+                            ParameterName = "id",
+                            Direction = System.Data.ParameterDirection.Output,
+                            SqlDbType = System.Data.SqlDbType.Int
+                        };
 
-                            command.CommandText = UserSql;
+                        command.Parameters.Add(idParam);
 
-                            command.Parameters.AddWithValue("@Name", user.Name);
-                            command.Parameters.AddWithValue("@Age", user.Age);
-                            command.Parameters.AddWithValue("@GroupId", user.GroupId);
+                        if (await command.ExecuteNonQueryAsync() == 0)
+                            throw new Exception("No changes in db");
 
-                            var idParam = new SqlParameter
-                            {
-                                ParameterName = "id",
-                                Direction = System.Data.ParameterDirection.Output,
-                                SqlDbType = System.Data.SqlDbType.Int
-                            };
-
-                            command.Parameters.Add(idParam);
-
-                            if (await command.ExecuteNonQueryAsync() == 0)
-                                throw new Exception("No changes in db");
-
-                            return Convert.ToInt32(idParam.Value);
-                        }
+                        return Convert.ToInt32(idParam.Value);
                     }
                 }
+            }
 
-                catch (DbException ex)
-                {
-                    var error = new Exception("DbError", ex);
-                    this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(error));
-                    Log.Logger.Error(error.ToString());
-                }
-                catch (Exception ex)
-                {
-                    this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(ex));
-                    Log.Logger.Error(ex.ToString());
-                }
+            catch (DbException ex)
+            {
+                var error = new Exception("DbError", ex);
+                this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(error));
+                Log.Logger.Error(error.ToString());
+            }
+            catch (Exception ex)
+            {
+                this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(ex));
+                Log.Logger.Error(ex.ToString());
+            }
 
 
-                return 0;
-            
+            return 0;
         }
-        public async Task  Delete(int Id)
+
+        public async Task Delete(int id)
         {
-            var sql = @"DELETE FROM [dbo].[User]
+            var sql = @"DELETE FROM [dbo].[Group]
                      WHERE Id = @Id";
             try
             {
-                using(var connection =new SqlConnection(this.connectionString))
+                using (var connection = new SqlConnection(this.connectionString))
                 {
                     await connection.OpenAsync();
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        command.Parameters.AddWithValue("@Id", Id);
-                        if (await command.ExecuteNonQueryAsync()==0)
+                        command.Parameters.AddWithValue("@Id", id);
+                        if (await command.ExecuteNonQueryAsync() == 0)
                             throw new Exception("No chages in db(Delete)");
                         return;
                     }
                 }
             }
-            
+
             catch (DbException ex)
             {
                 var error = new Exception("DbError", ex);
@@ -124,11 +109,11 @@ namespace AsyncWindowsApplication.Repositories
             }
         }
 
-        public async Task<IEnumerable<User>> Get()
+        public async Task<IEnumerable<Group>> Get()
         {
-            List<User> users = new List<User>();
+            List<Group> groups = new List<Group>();
 
-            var sql = @"SELECT * FROM [User]";
+            var sql = @"SELECT * FROM [Group]";
 
             try
             {
@@ -144,12 +129,11 @@ namespace AsyncWindowsApplication.Repositories
                         {
                             while (reader.Read())
                             {
-                                users.Add(new User
+                                groups.Add(new Group
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
-                                    Name = reader["Name"].ToString(),
-                                    Age = Convert.ToInt32(reader["Age"]),
-                                    GroupId= Convert.ToInt32(reader["GroupId"])
+                                    Title = reader["Title"].ToString()
+                                  
                                 });
                             }
                         }
@@ -167,12 +151,11 @@ namespace AsyncWindowsApplication.Repositories
                 this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(ex));
                 Log.Logger.Error(ex.ToString());
             }
-            return users;
+            return groups;
         }
-
-        public async Task Update(User user)
+            public async Task Update(Group group)
         {
-            var sql = @"UPDATE [dbo].[User] SET [Name] = @Name, [Age] = @Age,[GroupId]=@GroupId WHERE Id = @Id";
+            var sql = @"UPDATE [dbo].[Group] SET [Title] = @Title  WHERE Id = @Id";
             try
             {
                 using (var connection = new SqlConnection(this.connectionString))
@@ -182,17 +165,16 @@ namespace AsyncWindowsApplication.Repositories
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandText = sql;
-                        command.Parameters.AddWithValue("@Id", user.Id);
-                        command.Parameters.AddWithValue("@Name", user.Name);
-                        command.Parameters.AddWithValue("@Age", user.Age);
-                        command.Parameters.AddWithValue("@GroupId", user.GroupId);
+                        command.Parameters.AddWithValue("@Title", group.Title);
+                        command.Parameters.AddWithValue("@Id", group.Id);
+
 
 
 
                         if (await command.ExecuteNonQueryAsync() == 0)
                             throw new Exception("No changes in db(Update)");
                         return;
-                        
+
                     }
                 }
             }
@@ -207,7 +189,6 @@ namespace AsyncWindowsApplication.Repositories
                 this.NotifyClientErrorEvent.Invoke(this, new ErrorEventArgs(ex));
                 Log.Logger.Error(ex.ToString());
             }
-   
         }
     }
 }

@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace AsyncWindowsApplication.Models
 {
-    public class User
+   public  class Group
     {
+        public string  Title { get; set; }
         public int Id { get; set; }
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public int GroupId { get; set; }
         public override string ToString()
         {
-            return $"Id: {Id}, Name: {Name},Age: {Age},GroupId: {GroupId}";
+            return $"Id: {Id}, Title: {Title}";
         }
+
     }
 }
