@@ -37,11 +37,15 @@ namespace AsyncWindowsApplication.Repositories
                 {
                     await connection.OpenAsync();
 
-                    var adapter = new SqlDataAdapter("SELECT [Name], [Age] FROM [User]", connection);
+                    var adapter = new SqlDataAdapter(sqlQuery, connection);
 
                     var table = new DataTable("Users");
 
                     adapter.Fill(table);
+
+                    table.Columns["Id"].AutoIncrement = true;
+                    table.Columns["Id"].AutoIncrementSeed = 1;
+                    table.Columns["Id"].Unique = true;
 
                     var newRow = table.NewRow();
 
@@ -50,9 +54,11 @@ namespace AsyncWindowsApplication.Repositories
 
                     table.Rows.Add(newRow);
 
-                    //adapter.RowUpdated += (sender, args) =>
-                    //    this.NotifyInsertEvent.Invoke(this, 
-                    //    new NotifyInsertEventArgs(Convert.ToInt32(args.Row["Id"]))); 
+                    adapter.RowUpdated += (sender, e) =>
+                    {
+                        this.NotifyInsertEvent.Invoke(this,
+                        new NotifyInsertEventArgs(Convert.ToInt32(e.Row["Id"])));
+                    };
 
                     adapter.Update(table);
 

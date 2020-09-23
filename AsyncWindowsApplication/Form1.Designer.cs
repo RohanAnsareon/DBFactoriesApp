@@ -92,7 +92,7 @@
             this.userIdTxtBox.Location = new System.Drawing.Point(388, 32);
             this.userIdTxtBox.Name = "userIdTxtBox";
             this.userIdTxtBox.Size = new System.Drawing.Size(214, 26);
-            this.userIdTxtBox.TabIndex = 2;
+            this.userIdTxtBox.TabIndex = 1;
             // 
             // nameTextBox
             // 
@@ -106,7 +106,7 @@
             this.ageTextBox.Location = new System.Drawing.Point(388, 114);
             this.ageTextBox.Name = "ageTextBox";
             this.ageTextBox.Size = new System.Drawing.Size(214, 26);
-            this.ageTextBox.TabIndex = 2;
+            this.ageTextBox.TabIndex = 3;
             // 
             // Form1
             // 
